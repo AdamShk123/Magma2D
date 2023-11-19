@@ -1,3 +1,4 @@
 obj/
 .idea/
-main.exe
+magma
+cmake-build-debug/

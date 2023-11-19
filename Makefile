@@ -1,18 +1,18 @@
-all: clean compile link run
+build: clean compile link
 
-FILES := src/main.cpp
+FILES := src/main.cpp src/vk_engine.cpp
 
-LIBS := -l SDL2main -l SDL2
+LIBS := -l SDL2main -l SDL2 -l vulkan -l fmt
+
+clean:
+	rm obj/* magma
 
 compile:
-	g++ --std=c++17 -g ${FILES} -c
+	g++ --std=c++20 -g ${FILES} -c
 	mv *.o obj/
 
 link:
-	g++ obj/* -o main.exe ${LIBS}
-
-clean:
-	rm obj/* main.exe
+	g++ obj/*.o -o magma ${LIBS}
 
 run:
-	./main.exe
+	./magma
