@@ -5,6 +5,10 @@
 #include <map>
 #include <optional>
 #include <set>
+#include <cstdint> // Necessary for uint32_t
+#include <limits> // Necessary for std::numeric_limits
+#include <algorithm> // Necessary for std::clamp
+#include <fstream>
 
 #include <fmt/core.h>
 
@@ -37,6 +41,12 @@ struct QueueFamilyIndices {
     }
 };
 
+struct SwapChainSupportDetails {
+    VkSurfaceCapabilitiesKHR capabilities;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> presentModes;
+};
+
 class VulkanEngine
 {
 private:
@@ -49,6 +59,20 @@ private:
     VkQueue graphicsQueue;
     VkQueue presentQueue;
     VkSurfaceKHR surface;
+    VkSwapchainKHR swapChain;
+    std::vector<VkImage> swapChainImages;
+    std::vector<VkImageView> swapChainImageViews;
+    VkFormat swapChainImageFormat;
+    VkExtent2D swapChainExtent;
+    VkRenderPass renderPass;
+    VkPipelineLayout pipelineLayout;
+    VkPipeline graphicsPipeline;
+    std::vector<VkFramebuffer> swapChainFramebuffers;
+    VkCommandPool commandPool;
+    VkCommandBuffer commandBuffer;
+    VkSemaphore imageAvailableSemaphore;
+    VkSemaphore renderFinishedSemaphore;
+    VkFence inFlightFence;
     VkExtent2D windowExtent = {1920, 1200};
     SDL_Window *window = nullptr;
 
@@ -76,6 +100,38 @@ public:
     void createLogicalDevice();
 
     void createSurface();
+
+    bool checkDeviceExtensionSupport(VkPhysicalDevice pDevice);
+
+    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice pDevice);
+
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+    void createSwapChain();
+
+    void createImageViews();
+
+    void createGraphicsPipeline();
+
+    static std::vector<char> readFile(const std::string& filename);
+
+    VkShaderModule createShaderModule(const std::vector<char>& code);
+
+    void createRenderPass();
+
+    void createFramebuffers();
+
+    void createCommandPool();
+
+    void createCommandBuffer();
+
+    void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
+    void createSyncObjects();
 
     void close();
 
